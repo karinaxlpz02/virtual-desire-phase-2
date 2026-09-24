@@ -80,3 +80,15 @@ main {
 }
 #diagram[hidden] { display: none; }
 main.showing-diagram #term { visibility: hidden; }
+
+@media (max-width: 600px) {
+  :root { --display-size: clamp(48px, 12vw, 72px); }
+  main { padding-inline: 12px; }
+  .pixel { width: 2px; height: 2px; }
+  .heart {
+    width: 7px;
+    height: 7px;
+    font-size: 10px;
+    line-height: 7px;
+  }
+}
