@@ -3,8 +3,10 @@ const display = document.querySelector('#term-text');
 const diagram = document.querySelector('#diagram');
 const stage = document.querySelector('main');
 let diagramVisible = false;
+let hoverBlocked = false;
 
 function revealDiagram() {
+  if (hoverBlocked) return;
   if (!diagram.complete || !diagram.naturalWidth) return;
   diagramVisible = true;
   diagram.hidden = false;
@@ -12,6 +14,7 @@ function revealDiagram() {
 }
 
 function restoreTerms() {
+  if (diagramVisible) hoverBlocked = true;
   diagramVisible = false;
   diagram.hidden = true;
   stage.classList.remove('showing-diagram');
@@ -22,10 +25,20 @@ display.addEventListener('focus', revealDiagram);
 display.addEventListener('blur', restoreTerms);
 diagram.addEventListener('pointerleave', restoreTerms);
 document.addEventListener('pointermove', event => {
+  if (hoverBlocked) {
+    const textBounds = display.getBoundingClientRect();
+    if (event.clientX < textBounds.left || event.clientX > textBounds.right ||
+        event.clientY < textBounds.top || event.clientY > textBounds.bottom) hoverBlocked = false;
+  }
   if (!diagramVisible) return;
   const bounds = diagram.getBoundingClientRect();
-  if (event.clientX < bounds.left || event.clientX > bounds.right ||
-      event.clientY < bounds.top || event.clientY > bounds.bottom) restoreTerms();
+  // The central region has a radius of 154 units in the 917 × 916 SVG.
+  const scale = Math.min(bounds.width / 917, bounds.height / 916);
+  const centerX = bounds.left + bounds.width / 2;
+  const centerY = bounds.top + bounds.height / 2;
+  if (Math.hypot(event.clientX - centerX, event.clientY - centerY) > 154 * scale) {
+    restoreTerms();
+  }
 });
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') restoreTerms();
