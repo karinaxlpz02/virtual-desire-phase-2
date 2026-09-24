@@ -4,6 +4,7 @@
   color: #FF8DC8;
   background: #fff;
   font-family: var(--display-font);
+  cursor: url('assets/heart-cursor.svg') 16 16, auto;
 }
 * { box-sizing: border-box; }
 body { margin: 0; }
