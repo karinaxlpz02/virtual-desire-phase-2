@@ -86,9 +86,10 @@ main.showing-diagram #term { visibility: hidden; }
   main { padding-inline: 8px; touch-action: manipulation; }
   .pixel { width: 2px; height: 2px; }
   .heart {
-    width: 5px;
-    height: 5px;
-    font-size: 8px;
-    line-height: 5px;
+    width: 4px;
+    height: 4px;
+    font-size: 6px;
+    line-height: 4px;
   }
+  #pixels > .heart:nth-last-child(-n + 60) { display: none; }
 }
