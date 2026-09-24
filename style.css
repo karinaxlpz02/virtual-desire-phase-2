@@ -4,7 +4,6 @@
   color: #FF8DC8;
   background: #fff;
   font-family: var(--display-font);
-  cursor: url('assets/heart-cursor.svg') 16 16, auto;
 }
 * { box-sizing: border-box; }
 body { margin: 0; }
@@ -29,6 +28,20 @@ body { margin: 0; }
   font-family: Arial, sans-serif;
   font-size: 15px;
   line-height: 11px;
+}
+#heart-cursor {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  visibility: hidden;
+}
+html.heart-cursor-active,
+html.heart-cursor-active * {
+  cursor: none !important;
+}
+html.heart-cursor-active #heart-cursor {
+  visibility: visible;
 }
 main {
   position: relative;

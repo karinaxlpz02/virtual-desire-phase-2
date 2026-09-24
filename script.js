@@ -1,5 +1,28 @@
 const display = document.querySelector('#term');
 const pixelLayer = document.querySelector('#pixels');
+const heartCursor = document.createElement('span');
+heartCursor.id = 'heart-cursor';
+heartCursor.className = 'heart';
+heartCursor.textContent = '♥';
+heartCursor.setAttribute('aria-hidden', 'true');
+document.body.append(heartCursor);
+
+function hideHeartCursor() {
+  document.documentElement.classList.remove('heart-cursor-active');
+}
+
+document.addEventListener('pointermove', event => {
+  if (event.pointerType === 'touch') {
+    hideHeartCursor();
+    return;
+  }
+  heartCursor.style.left = `${event.clientX}px`;
+  heartCursor.style.top = `${event.clientY}px`;
+  document.documentElement.classList.add('heart-cursor-active');
+});
+document.documentElement.addEventListener('pointerleave', hideHeartCursor);
+document.addEventListener('pointercancel', hideHeartCursor);
+window.addEventListener('blur', hideHeartCursor);
 const pixels = Array.from({ length: 300 }, () => {
   const pixel = document.createElement('span');
   pixel.className = 'pixel';
