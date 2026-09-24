@@ -82,8 +82,8 @@ main {
 main.showing-diagram #term { visibility: hidden; }
 
 @media (max-width: 600px) {
-  :root { --display-size: clamp(48px, 12vw, 72px); }
-  main { padding-inline: 12px; }
+  :root { --display-size: clamp(52px, 13vw, 78px); }
+  main { padding-inline: 8px; touch-action: manipulation; }
   .pixel { width: 2px; height: 2px; }
   .heart {
     width: 7px;

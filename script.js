@@ -5,6 +5,7 @@ const stage = document.querySelector('main');
 let diagramVisible = false;
 let wordTimer;
 let pointerPosition = null;
+const mobileInteraction = window.matchMedia('(hover: none), (pointer: coarse)');
 
 function revealDiagram() {
   if (diagramVisible) return;
@@ -24,20 +25,24 @@ function restoreTerms() {
   stage.classList.remove('showing-diagram');
 }
 
-function updateCenterHover() {
-  if (!pointerPosition) return;
+function insideCenterCircle(x, y) {
   // A medium circle, shrinking proportionally on smaller screens.
   const radius = Math.min(150, window.innerWidth * 0.22, window.innerHeight * 0.22);
   const distance = Math.hypot(
-    pointerPosition.x - window.innerWidth / 2,
-    pointerPosition.y - window.innerHeight / 2
+    x - window.innerWidth / 2,
+    y - window.innerHeight / 2
   );
-  if (distance <= radius) revealDiagram();
+  return distance <= radius;
+}
+
+function updateCenterHover() {
+  if (!pointerPosition || mobileInteraction.matches) return;
+  if (insideCenterCircle(pointerPosition.x, pointerPosition.y)) revealDiagram();
   else restoreTerms();
 }
 
 document.addEventListener('pointermove', event => {
-  if (event.pointerType === 'touch') return;
+  if (event.pointerType === 'touch' || mobileInteraction.matches) return;
   pointerPosition = { x: event.clientX, y: event.clientY };
   updateCenterHover();
 });
@@ -45,8 +50,12 @@ function leaveCenterHover() {
   pointerPosition = null;
   restoreTerms();
 }
-document.documentElement.addEventListener('pointerleave', leaveCenterHover);
-document.addEventListener('pointercancel', leaveCenterHover);
+document.documentElement.addEventListener('pointerleave', () => {
+  if (!mobileInteraction.matches) leaveCenterHover();
+});
+document.addEventListener('pointercancel', () => {
+  if (!mobileInteraction.matches) leaveCenterHover();
+});
 window.addEventListener('resize', updateCenterHover);
 diagram.addEventListener('load', updateCenterHover);
 document.addEventListener('keydown', event => {
@@ -67,6 +76,10 @@ document.body.append(stampLayer);
 
 document.addEventListener('click', event => {
   if (event.detail === 0) return;
+  if (mobileInteraction.matches) {
+    if (diagramVisible) restoreTerms();
+    else if (insideCenterCircle(event.clientX, event.clientY)) revealDiagram();
+  }
   const stamp = document.createElement('span');
   stamp.className = 'heart heart-stamp';
   stamp.textContent = '♥';
