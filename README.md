@@ -1,4 +1,4 @@
-# Research Display
+# VIRTUAL DESIRE: PHASE 2
 
 A white page with centered #FF8DC8 text. One term appears at a time, changing every second. Every term uses the same font size at a given screen width.
 
