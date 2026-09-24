@@ -148,6 +148,7 @@ const measureContext = document.createElement('canvas').getContext('2d');
 
 function fitTerms() {
   display.style.removeProperty('font-size');
+  termContainer.style.removeProperty('transform');
   const style = getComputedStyle(display);
   const baseSize = parseFloat(style.fontSize);
   measureContext.font = `${style.fontWeight} ${baseSize}px ${style.fontFamily}`;
@@ -157,7 +158,13 @@ function fitTerms() {
   }
   if (widest > 0) {
     const available = Math.max(1, termContainer.clientWidth - 4);
-    display.style.fontSize = `${baseSize * Math.min(1, available / widest)}px`;
+    const fittedSize = baseSize * Math.min(1, available / widest);
+    const mobileBonus = window.matchMedia('(max-width: 600px)').matches ? 2 * 96 / 72 : 0;
+    const fontSize = fittedSize + mobileBonus;
+    display.style.fontSize = `${fontSize}px`;
+    // Preserve one line and side padding with the larger mobile type.
+    const horizontalScale = Math.min(1, available / (widest * fontSize / baseSize));
+    termContainer.style.transform = `scaleX(${horizontalScale})`;
   }
 }
 
