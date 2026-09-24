@@ -106,9 +106,16 @@ const hearts = Array.from({ length: 100 }, () => {
 });
 
 function scatterPixels() {
-  for (const pixel of [...pixels, ...hearts]) {
-    pixel.style.left = `${Math.random() * Math.max(0, pixelLayer.clientWidth - pixel.offsetWidth)}px`;
-    pixel.style.top = `${Math.random() * Math.max(0, pixelLayer.clientHeight - pixel.offsetHeight)}px`;
+  const width = pixelLayer.clientWidth;
+  const height = pixelLayer.clientHeight;
+  const sizes = [pixels, hearts].map(group => ({
+    group, width: group[0].offsetWidth, height: group[0].offsetHeight
+  }));
+  for (const size of sizes) {
+    for (const pixel of size.group) {
+      pixel.style.left = `${Math.random() * Math.max(0, width - size.width)}px`;
+      pixel.style.top = `${Math.random() * Math.max(0, height - size.height)}px`;
+    }
   }
 }
 
