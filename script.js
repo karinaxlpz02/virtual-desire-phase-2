@@ -114,6 +114,7 @@ function scatterPixels() {
 function showTerm(term) {
   if (display.textContent === term) return;
   display.textContent = term;
+  stampLayer.replaceChildren();
   scatterPixels();
 }
 
