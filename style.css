@@ -52,6 +52,7 @@ main {
   padding: 32px clamp(24px, 6vw, 96px);
 }
 #term {
+  grid-area: 1 / 1;
   min-width: 0;
   width: 100%;
   text-align: center;
@@ -60,3 +61,11 @@ main {
   line-height: 1.1;
   white-space: pre;
 }
+#diagram {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: min(917px, calc(100svh - 64px));
+  object-fit: contain;
+}
+#diagram[hidden] { display: none; }
+main.showing-diagram #term { visibility: hidden; }

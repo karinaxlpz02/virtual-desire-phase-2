@@ -1,4 +1,36 @@
-const display = document.querySelector('#term');
+const termContainer = document.querySelector('#term');
+const display = document.querySelector('#term-text');
+const diagram = document.querySelector('#diagram');
+const stage = document.querySelector('main');
+let diagramVisible = false;
+
+function revealDiagram() {
+  if (!diagram.complete || !diagram.naturalWidth) return;
+  diagramVisible = true;
+  diagram.hidden = false;
+  stage.classList.add('showing-diagram');
+}
+
+function restoreTerms() {
+  diagramVisible = false;
+  diagram.hidden = true;
+  stage.classList.remove('showing-diagram');
+}
+
+display.addEventListener('pointerenter', revealDiagram);
+display.addEventListener('focus', revealDiagram);
+display.addEventListener('blur', restoreTerms);
+diagram.addEventListener('pointerleave', restoreTerms);
+document.addEventListener('pointermove', event => {
+  if (!diagramVisible) return;
+  const bounds = diagram.getBoundingClientRect();
+  if (event.clientX < bounds.left || event.clientX > bounds.right ||
+      event.clientY < bounds.top || event.clientY > bounds.bottom) restoreTerms();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') restoreTerms();
+});
+window.addEventListener('blur', restoreTerms);
 const pixelLayer = document.querySelector('#pixels');
 const heartCursor = document.createElement('span');
 heartCursor.id = 'heart-cursor';
@@ -67,7 +99,7 @@ function fitTerms() {
     widest = Math.max(widest, measureContext.measureText(term).width);
   }
   if (widest > 0) {
-    const available = Math.max(1, display.clientWidth - 4);
+    const available = Math.max(1, termContainer.clientWidth - 4);
     display.style.fontSize = `${baseSize * Math.min(1, available / widest)}px`;
   }
 }
@@ -115,7 +147,7 @@ async function refreshAssets() {
 }
 refreshAssets();
 setInterval(() => {
-  if (!terms.length || document.hidden) return;
+  if (!terms.length || document.hidden || diagramVisible) return;
   if (terms.length > 1) {
     const offset = 1 + Math.floor(Math.random() * (terms.length - 1));
     index = (index + offset) % terms.length;
