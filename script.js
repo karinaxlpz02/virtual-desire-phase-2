@@ -4,17 +4,24 @@ const diagram = document.querySelector('#diagram');
 const stage = document.querySelector('main');
 let diagramVisible = false;
 let hoverBlocked = false;
+let wordTimer;
+const heartOutline = new Path2D("M508.419 382.43C521.248 379.857 534.079 379.857 546.907 382.429H546.908C559.826 384.94 571.308 390.06 581.345 397.789C591.145 405.333 597.716 414.216 601.022 424.441L601.322 425.393C604.323 435.233 604.222 445.138 601.022 455.093C597.796 465.38 591.226 474.388 581.348 482.118L458.323 578.394L458.016 578.635L457.707 578.394L334.683 482.118C324.804 474.387 318.194 465.38 314.888 455.093L314.887 455.089C311.665 444.814 311.704 434.593 315.008 424.441L315.327 423.487C318.728 413.663 325.191 405.097 334.686 397.789C344.721 390.061 356.162 384.942 369 382.43L370.21 382.196C382.714 379.86 395.182 379.937 407.611 382.43H407.61C420.526 385.004 432.006 390.122 442.042 397.787L458.015 409.919L473.988 397.787H473.989C484.104 390.123 495.582 385.004 508.419 382.43Z");
+const hitContext = document.createElement("canvas").getContext("2d");
 
 function revealDiagram() {
   if (hoverBlocked) return;
   if (!diagram.complete || !diagram.naturalWidth) return;
+  clearInterval(wordTimer);
   diagramVisible = true;
   diagram.hidden = false;
   stage.classList.add('showing-diagram');
 }
 
 function restoreTerms() {
-  if (diagramVisible) hoverBlocked = true;
+  if (!diagramVisible) return;
+  hoverBlocked = true;
+  clearInterval(wordTimer);
+  wordTimer = setInterval(advanceTerm, 1000);
   diagramVisible = false;
   diagram.hidden = true;
   stage.classList.remove('showing-diagram');
@@ -32,11 +39,12 @@ document.addEventListener('pointermove', event => {
   }
   if (!diagramVisible) return;
   const bounds = diagram.getBoundingClientRect();
-  // The central region has a radius of 154 units in the 917 × 916 SVG.
   const scale = Math.min(bounds.width / 917, bounds.height / 916);
-  const centerX = bounds.left + bounds.width / 2;
-  const centerY = bounds.top + bounds.height / 2;
-  if (Math.hypot(event.clientX - centerX, event.clientY - centerY) > 154 * scale) {
+  const left = bounds.left + (bounds.width - 917 * scale) / 2;
+  const top = bounds.top + (bounds.height - 916 * scale) / 2;
+  const x = (event.clientX - left) / scale;
+  const y = (event.clientY - top) / scale;
+  if (!hitContext.isPointInPath(heartOutline, x, y)) {
     restoreTerms();
   }
 });
@@ -51,6 +59,20 @@ heartCursor.className = 'heart';
 heartCursor.textContent = '♥';
 heartCursor.setAttribute('aria-hidden', 'true');
 document.body.append(heartCursor);
+const stampLayer = document.createElement('div');
+stampLayer.id = 'heart-stamps';
+stampLayer.setAttribute('aria-hidden', 'true');
+document.body.append(stampLayer);
+
+document.addEventListener('click', event => {
+  if (event.detail === 0) return;
+  const stamp = document.createElement('span');
+  stamp.className = 'heart heart-stamp';
+  stamp.textContent = '♥';
+  stamp.style.left = `${event.clientX}px`;
+  stamp.style.top = `${event.clientY}px`;
+  stampLayer.append(stamp);
+});
 
 function hideHeartCursor() {
   document.documentElement.classList.remove('heart-cursor-active');
@@ -159,11 +181,12 @@ async function refreshAssets() {
   setTimeout(refreshAssets, 2000);
 }
 refreshAssets();
-setInterval(() => {
+function advanceTerm() {
   if (!terms.length || document.hidden || diagramVisible) return;
   if (terms.length > 1) {
     const offset = 1 + Math.floor(Math.random() * (terms.length - 1));
     index = (index + offset) % terms.length;
   }
   showTerm(terms[index]);
-}, 1000);
+}
+wordTimer = setInterval(advanceTerm, 1000);

@@ -36,6 +36,17 @@ body { margin: 0; }
   transform: translate(-50%, -50%);
   visibility: hidden;
 }
+#heart-stamps {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+.heart-stamp {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
 html.heart-cursor-active,
 html.heart-cursor-active * {
   cursor: none !important;
